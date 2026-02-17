@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-900: #061325;
+  --bg-800: #0b2041;
+  --glass-bg: rgba(15, 35, 62, 0.62);
+  --glass-border: rgba(140, 198, 255, 0.25);
+  --text-primary: #f2f7ff;
+  --text-secondary: #b9cde7;
+  --accent: #6be4ff;
+  --success: #45d18f;
+  --danger: #ff6b7d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--text-primary);
+  font-family:
+    'Avenir Next',
+    'Nunito',
+    'Segoe UI',
+    'Trebuchet MS',
+    ui-sans-serif,
+    system-ui;
+  background:
+    radial-gradient(110% 80% at 0% 0%, rgba(64, 104, 177, 0.28) 0%, rgba(6, 19, 37, 0) 55%),
+    radial-gradient(80% 80% at 100% 10%, rgba(67, 184, 255, 0.12) 0%, rgba(6, 19, 37, 0) 60%),
+    linear-gradient(160deg, var(--bg-900) 0%, var(--bg-800) 100%);
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family:
+    'Fredoka',
+    'Baloo 2',
+    'Avenir Next',
+    'Segoe UI',
+    ui-sans-serif,
+    system-ui;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 10px 40px rgba(2, 8, 24, 0.45);
+}
+
+.text-muted {
+  color: var(--text-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
