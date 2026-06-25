@@ -280,6 +280,77 @@ const signedRangeValue = (maxAbs: number, allowNegatives: boolean, rng: RNG): nu
   return maybeSigned(absValue, allowNegatives, rng);
 };
 
+const generateGrade3EasyAddition = (rng: RNG): RawQuestion => {
+  const pattern = pick(
+    ['basic-small', 'make-ten', 'double', 'tens-and-ones', 'near-double'] as const,
+    rng
+  );
+
+  if (pattern === 'make-ten') {
+    const a = randomInt(0, 10, rng);
+    const b = 10 - a;
+    return { a, b, answer: a + b, pattern: 'g3-easy-add-make-ten' };
+  }
+
+  if (pattern === 'double') {
+    const a = randomInt(0, 10, rng);
+    return { a, b: a, answer: a * 2, pattern: 'g3-easy-add-double' };
+  }
+
+  if (pattern === 'tens-and-ones') {
+    const a = pick([10, 20, 30], rng);
+    const b = randomInt(0, Math.min(9, 60 - a), rng);
+    return { a, b, answer: a + b, pattern: 'g3-easy-add-tens-and-ones' };
+  }
+
+  if (pattern === 'near-double') {
+    const a = randomInt(1, 10, rng);
+    const b = a + 1;
+    return { a, b, answer: a + b, pattern: 'g3-easy-add-near-double' };
+  }
+
+  const a = randomInt(0, 30, rng);
+  const b = randomInt(0, Math.min(30, 60 - a), rng);
+  return { a, b, answer: a + b, pattern: 'g3-easy-add-basic' };
+};
+
+const generateGrade3EasySubtraction = (rng: RNG): RawQuestion => {
+  const pattern = pick(
+    ['basic-small', 'fact-family', 'subtract-small', 'subtract-tens', 'to-zero'] as const,
+    rng
+  );
+
+  if (pattern === 'fact-family') {
+    const partA = randomInt(0, 15, rng);
+    const partB = randomInt(0, 15, rng);
+    const total = partA + partB;
+    return chance(0.5, rng)
+      ? { a: total, b: partA, answer: partB, pattern: 'g3-easy-sub-fact-family-a' }
+      : { a: total, b: partB, answer: partA, pattern: 'g3-easy-sub-fact-family-b' };
+  }
+
+  if (pattern === 'subtract-small') {
+    const a = randomInt(5, 30, rng);
+    const b = randomInt(0, Math.min(10, a), rng);
+    return { a, b, answer: a - b, pattern: 'g3-easy-sub-small' };
+  }
+
+  if (pattern === 'subtract-tens') {
+    const a = pick([10, 20, 30, 40, 50, 60], rng);
+    const b = Math.min(a, pick([0, 10, 20, 30], rng));
+    return { a, b, answer: a - b, pattern: 'g3-easy-sub-tens' };
+  }
+
+  if (pattern === 'to-zero') {
+    const a = randomInt(0, 20, rng);
+    return { a, b: a, answer: 0, pattern: 'g3-easy-sub-to-zero' };
+  }
+
+  const a = randomInt(0, 60, rng);
+  const b = randomInt(0, a, rng);
+  return { a, b, answer: a - b, pattern: 'g3-easy-sub-basic' };
+};
+
 const generateGrade3 = (
   op: Operation,
   difficulty: Difficulty,
@@ -288,15 +359,11 @@ const generateGrade3 = (
 ): RawQuestion => {
   if (difficulty === 'easy') {
     if (op === '+') {
-      const a = randomInt(0, 30, rng);
-      const b = randomInt(0, Math.min(30, 60 - a), rng);
-      return { a, b, answer: a + b, pattern: 'g3-easy-add-basic' };
+      return generateGrade3EasyAddition(rng);
     }
 
     if (op === '-') {
-      const a = randomInt(0, 60, rng);
-      const b = randomInt(0, a, rng);
-      return { a, b, answer: a - b, pattern: 'g3-easy-sub-nonnegative' };
+      return generateGrade3EasySubtraction(rng);
     }
 
     if (op === '*') {
@@ -311,11 +378,17 @@ const generateGrade3 = (
 
   if (difficulty === 'medium') {
     if (op === '+') {
-      const useStepPattern = chance(0.35 + biasHarder * 0.1, rng);
-      if (useStepPattern) {
+      const pattern = pick(['step', 'friendly-tens', 'range'] as const, rng);
+      if (pattern === 'step') {
         const b = pick([10, 20, 30] as const, rng);
         const a = randomInt(0, Math.min(200, 300 - b), rng);
         return { a, b, answer: a + b, pattern: 'g3-medium-add-steps' };
+      }
+
+      if (pattern === 'friendly-tens') {
+        const a = pick([20, 30, 40, 50, 60, 70, 80, 90], rng);
+        const b = Math.min(300 - a, pick([10, 20, 30, 40, 50, 60, 70, 80], rng));
+        return { a, b, answer: a + b, pattern: 'g3-medium-add-friendly-tens' };
       }
 
       const a = randomInt(0, 200, rng);
@@ -324,8 +397,8 @@ const generateGrade3 = (
     }
 
     if (op === '-') {
-      const crossTens = chance(0.35 + biasHarder * 0.2, rng);
-      if (crossTens) {
+      const pattern = pick(['cross-tens', 'friendly-tens', 'range'] as const, rng);
+      if (pattern === 'cross-tens') {
         return withRetries(
           () => {
             const a = randomInt(20, 300, rng);
@@ -339,6 +412,12 @@ const generateGrade3 = (
             return { a, b, answer: a - b, pattern: 'g3-medium-sub-fallback' };
           }
         );
+      }
+
+      if (pattern === 'friendly-tens') {
+        const a = randomInt(20, 300, rng);
+        const b = Math.min(a, pick([10, 20, 30, 40, 50, 60, 70, 80, 90], rng));
+        return { a, b, answer: a - b, pattern: 'g3-medium-sub-friendly-tens' };
       }
 
       const a = randomInt(0, 300, rng);
@@ -380,11 +459,17 @@ const generateGrade3 = (
   }
 
   if (op === '+') {
-    const scaled = chance(0.4 + biasHarder * 0.2, rng);
-    if (scaled) {
+    const pattern = pick(['scaled', 'bridge-hundred', 'range'] as const, rng);
+    if (pattern === 'scaled') {
       const b = chance(0.6, rng) ? randomInt(1, 50, rng) * 10 : randomInt(1, 5, rng) * 100;
       const a = randomInt(0, Math.min(500, 1000 - b), rng);
       return { a, b, answer: a + b, pattern: 'g3-hard-add-multiples' };
+    }
+
+    if (pattern === 'bridge-hundred') {
+      const a = pick([90, 180, 190, 280, 290, 390, 490], rng);
+      const b = Math.min(1000 - a, pick([10, 20, 30, 40, 50, 100, 200], rng));
+      return { a, b, answer: a + b, pattern: 'g3-hard-add-bridge-hundred' };
     }
 
     const a = randomInt(0, 500, rng);
@@ -393,8 +478,8 @@ const generateGrade3 = (
   }
 
   if (op === '-') {
-    const borrowHundreds = chance(0.45 + biasHarder * 0.2, rng);
-    if (borrowHundreds) {
+    const pattern = pick(['borrow-hundreds', 'round-hundreds', 'range'] as const, rng);
+    if (pattern === 'borrow-hundreds') {
       return withRetries(
         () => {
           const a = randomInt(100, 1000, rng);
@@ -408,6 +493,12 @@ const generateGrade3 = (
           return { a, b, answer: a - b, pattern: 'g3-hard-sub-fallback' };
         }
       );
+    }
+
+    if (pattern === 'round-hundreds') {
+      const a = randomInt(200, 1000, rng);
+      const b = Math.min(a, pick([100, 200, 300, 400, 500], rng));
+      return { a, b, answer: a - b, pattern: 'g3-hard-sub-round-hundreds' };
     }
 
     const a = randomInt(0, 1000, rng);

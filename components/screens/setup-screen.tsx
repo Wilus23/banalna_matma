@@ -63,11 +63,10 @@ const createUpdatedForGrade = (current: QuizSettings, grade: QuizSettings['grade
 const buildSamples = (settings: QuizSettings) => {
   try {
     return generateQuizSet({
-      count: 50,
+      count: 100,
       grade: settings.grade,
       difficulty: settings.difficulty,
       ops: settings.operations,
-      seed: 1337,
       decimalsMode: settings.decimalsMode,
       allowNegatives: settings.allowNegatives
     });
@@ -312,7 +311,7 @@ export const SetupScreen = ({ settings, onStart }: SetupScreenProps) => {
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="font-semibold">Podgląd deweloperski</p>
-                  <p className="text-sm text-slate-300">Podgląd 50 wygenerowanych pytań dla bieżących ustawień.</p>
+                  <p className="text-sm text-slate-300">Losowy podgląd 100 wygenerowanych pytań dla bieżących ustawień.</p>
                 </div>
                 <Button
                   variant="secondary"

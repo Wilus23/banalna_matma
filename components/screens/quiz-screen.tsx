@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { formatMs, formatPercent } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import type { GeneratedQuestion, QuizSettings } from '@/types/quiz';
 
 interface QuizScreenProps {
@@ -25,7 +26,7 @@ interface QuizScreenProps {
   avgAnswerMs: number;
 }
 
-const keypadValues = ['7', '8', '9', '4', '5', '6', '1', '2', '3', '.', '0', '⌫'];
+const keypadValues = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
 export const QuizScreen = ({
   settings,
@@ -44,6 +45,7 @@ export const QuizScreen = ({
 }: QuizScreenProps) => {
   const reduceMotion = useReducedMotion();
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const footerKeyCount = 2 + Number(settings.decimalsMode) + Number(settings.allowNegatives);
 
   useEffect(() => {
     if (feedback !== null) {
@@ -175,19 +177,74 @@ export const QuizScreen = ({
           </div>
         </form>
 
-        <div className="grid grid-cols-4 gap-2 sm:hidden">
-          {(settings.allowNegatives ? ['-', ...keypadValues] : keypadValues).map((value) => (
+        <div className="space-y-2 sm:hidden">
+          <div className="grid grid-cols-3 gap-2">
+            {keypadValues.map((value) => (
+              <Button
+                key={value}
+                type="button"
+                variant="secondary"
+                className="h-14 rounded-xl text-xl font-bold"
+                aria-label={`Klawisz ${value}`}
+                onClick={() => handleKeypadPress(value)}
+              >
+                {value}
+              </Button>
+            ))}
+          </div>
+
+          <div
+            className={cn(
+              'grid gap-2',
+              footerKeyCount === 2 && 'grid-cols-2',
+              footerKeyCount === 3 && 'grid-cols-3',
+              footerKeyCount === 4 && 'grid-cols-4'
+            )}
+          >
+            {settings.allowNegatives && (
+              <Button
+                type="button"
+                variant="secondary"
+                className="h-14 rounded-xl text-xl font-bold"
+                aria-label="Klawisz minus"
+                onClick={() => handleKeypadPress('-')}
+              >
+                -
+              </Button>
+            )}
+
+            {settings.decimalsMode && (
+              <Button
+                type="button"
+                variant="secondary"
+                className="h-14 rounded-xl text-xl font-bold"
+                aria-label="Klawisz przecinek dziesiętny"
+                onClick={() => handleKeypadPress('.')}
+              >
+                ,
+              </Button>
+            )}
+
             <Button
-              key={value}
               type="button"
               variant="secondary"
-              className="h-12 rounded-lg text-lg"
-              aria-label={value === '⌫' ? 'Usuń znak' : `Klawisz ${value}`}
-              onClick={() => handleKeypadPress(value)}
+              className="h-14 rounded-xl text-xl font-bold"
+              aria-label="Klawisz 0"
+              onClick={() => handleKeypadPress('0')}
             >
-              {value}
+              0
             </Button>
-          ))}
+
+            <Button
+              type="button"
+              variant="secondary"
+              className="h-14 rounded-xl text-xl font-bold"
+              aria-label="Usuń znak"
+              onClick={() => handleKeypadPress('⌫')}
+            >
+              ⌫
+            </Button>
+          </div>
         </div>
       </Card>
 

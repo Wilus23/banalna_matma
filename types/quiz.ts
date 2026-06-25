@@ -9,7 +9,7 @@ export interface QuizSettings {
   grade: SelectableGrade;
   difficulty: Difficulty;
   operations: Operation[];
-  questionCount: 10 | 20 | 30;
+  questionCount: 5 | 10 | 20;
   soundEnabled: boolean;
   focusMode: boolean;
   decimalsMode: boolean;

@@ -51,5 +51,5 @@ npm run build
 ## Notes
 
 - Grade 3 constraints are explicitly enforced and tested.
-- Developer-only 50-question preview is available on Setup in non-production builds.
+- Developer-only 100-question preview is available on Setup in non-production builds.
 - Focus mode hides history/leaderboard on the results screen.

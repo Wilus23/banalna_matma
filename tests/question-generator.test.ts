@@ -125,6 +125,36 @@ describe('question generator - grade 3 safety and constraints', () => {
       expect(question.prompt.endsWith('=')).toBe(true);
     }
   });
+
+  it('uses multiple easy patterns for grade 3 addition and subtraction', () => {
+    const addRng = createSeededRng(2026);
+    const subRng = createSeededRng(2027);
+    const addPatterns = new Set<string>();
+    const subPatterns = new Set<string>();
+
+    for (let index = 0; index < 200; index += 1) {
+      addPatterns.add(
+        generateQuestion({
+          grade: 3,
+          difficulty: 'easy',
+          ops: ['+'],
+          rng: addRng
+        }).meta.pattern
+      );
+
+      subPatterns.add(
+        generateQuestion({
+          grade: 3,
+          difficulty: 'easy',
+          ops: ['-'],
+          rng: subRng
+        }).meta.pattern
+      );
+    }
+
+    expect(addPatterns.size).toBeGreaterThanOrEqual(4);
+    expect(subPatterns.size).toBeGreaterThanOrEqual(4);
+  });
 });
 
 describe('question generator - global safety and determinism', () => {
